@@ -1361,6 +1361,31 @@ opcode! {
     }
 }
 
+opcode! {
+    /// Change permissions of a file, equivalent to `fchmodat(2)`.
+    pub struct FchmodAt {
+        dirfd: { impl sealed::UseFd },
+        pathname: { *const sys::c_char },
+        mode: { sys::Mode },
+        ;;
+        flags: sys::AtFlags = sys::AtFlags::empty()
+    }
+
+    pub const CODE = sys::IoringOp::Fchmodat;
+
+    pub fn build(self) -> Entry {
+        let FchmodAt { dirfd, pathname, mode, flags } = self;
+
+        let mut sqe = sqe_zeroed();
+        sqe.opcode = Self::CODE;
+        sqe.fd = dirfd;
+        sqe.addr_or_splice_off_in.addr.ptr = pathname as _;
+        sqe.len.len = mode.bits();
+        sqe.op_flags.fchmod_flags = flags;
+        Entry(sqe)
+    }
+}
+
 // === 5.15 ===
 
 opcode! {

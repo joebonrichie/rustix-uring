@@ -1012,3 +1012,47 @@ pub fn test_fixed_fd_install<S: squeue::EntryMarker, C: cqueue::EntryMarker>(
 
     Ok(())
 }
+
+pub fn test_fchmodat<S: squeue::EntryMarker, C: cqueue::EntryMarker>(
+    ring: &mut IoUring<S, C>,
+    test: &Test,
+) -> anyhow::Result<()> {
+    require!(
+        test;
+        test.probe.is_supported(opcode::FchmodAt::CODE);
+    );
+
+    println!("test fchmodat");
+
+    use std::os::unix::fs::PermissionsExt;
+
+    let temp_dir = tempfile::tempdir()?;
+    let file_path = temp_dir.path().join("test_fchmodat");
+    std::fs::File::create(&file_path)?;
+    std::fs::set_permissions(&file_path, std::fs::Permissions::from_mode(0o644))?;
+
+    let path_cstr = std::ffi::CString::new(file_path.as_os_str().as_bytes())?;
+    let dfd = types::Fd(libc::AT_FDCWD);
+    let mode = rustix::fs::Mode::from_bits(0o755).unwrap();
+    let flags = rustix::fs::AtFlags::empty();
+
+    let fchmodat_e = opcode::FchmodAt::new(dfd, path_cstr.as_ptr(), mode).flags(flags);
+
+    unsafe {
+        ring.submission()
+            .push(&fchmodat_e.build().user_data(0x42).into())
+            .map_err(|_| anyhow::anyhow!("submission queue is full"))?;
+    }
+
+    ring.submit_and_wait(1)?;
+
+    let cqes: Vec<cqueue::Entry> = ring.completion().map(Into::into).collect();
+    assert_eq!(cqes.len(), 1);
+    assert_eq!(cqes[0].user_data(), 0x42);
+    assert_eq!(cqes[0].result(), Ok(0));
+
+    let metadata = std::fs::metadata(&file_path)?;
+    assert_eq!(metadata.permissions().mode() & 0o777, 0o755);
+
+    Ok(())
+}

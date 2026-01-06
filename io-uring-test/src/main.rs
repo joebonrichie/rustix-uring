@@ -105,6 +105,7 @@ fn test<S: squeue::EntryMarker, C: cqueue::EntryMarker>(
     tests::fs::test_statx(&mut ring, &test)?;
     tests::fs::test_file_splice(&mut ring, &test)?;
     tests::fs::test_ftruncate(&mut ring, &test)?;
+    tests::fs::test_fchmodat(&mut ring, &test)?;
     tests::fs::test_fixed_fd_install(&mut ring, &test)?;
 
     // timeout
