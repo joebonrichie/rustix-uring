@@ -1210,7 +1210,8 @@ IORING_OP_EPOLL_WAIT = 59,
 IORING_OP_READV_FIXED = 60,
 IORING_OP_WRITEV_FIXED = 61,
 IORING_OP_PIPE = 62,
-IORING_OP_LAST = 63,
+IORING_OP_FCHMODAT = 63,
+IORING_OP_LAST = 64,
 }
 #[repr(u32)]
 #[non_exhaustive]
@@ -1397,6 +1398,7 @@ pub futex_flags: __u32,
 pub install_fd_flags: __u32,
 pub nop_flags: __u32,
 pub pipe_flags: __u32,
+pub fchmod_flags: __u32,
 }
 #[repr(C, packed)]
 #[derive(Copy, Clone)]
