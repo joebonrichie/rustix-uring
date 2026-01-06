@@ -652,6 +652,9 @@ pub enum IoringOp {
 
     /// `IORING_OP_LISTEN` (since Linux 6.11)
     Listen = sys::io_uring_op::IORING_OP_LISTEN as _,
+
+    /// `IORING_OP_FCHMODAT` (since Linux 6.17) (DOWNSTREAM ONLY)
+    Fchmodat = sys::io_uring_op::IORING_OP_FCHMODAT as _,
 }
 
 impl Default for IoringOp {
@@ -1533,6 +1536,7 @@ pub union op_flags_union {
     pub uring_cmd_flags: IoringUringCmdFlags,
     pub futex_flags: FutexWaitvFlags,
     pub install_fd_flags: IoringFixedFdFlags,
+    pub fchmod_flags: AtFlags,
 }
 
 #[allow(missing_docs)]
