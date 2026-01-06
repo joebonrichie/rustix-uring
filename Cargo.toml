@@ -27,3 +27,6 @@ anyhow = "1"
 rustix = "1.0.2"
 socket2 = "0.5"
 slab = "0.4"
+
+[patch.crates-io]
+rustix = { path = "crates/rustix" }
