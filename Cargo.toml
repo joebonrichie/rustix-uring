@@ -15,18 +15,15 @@ rust-version = "1.81"
 
 [workspace]
 exclude = ["/flake.*", ".envrc"]
-members = [ "io-uring-test", "io-uring-bench" ]
+members = [ "io-uring-test", "io-uring-bench", "crates/linux-raw-sys", "crates/linux-raw-sys/gen", "crates/rustix" ]
 
 [dependencies]
 bitflags = { version = "2.4.0", default-features = false }
-rustix = { version = "1.0.2", default-features = false, features = ["io_uring", "mm", "thread"] }
+rustix = { path = "crates/rustix", default-features = false, features = ["io_uring", "mm", "thread"] }
 
 [dev-dependencies]
 libc = "0.2.98"
 anyhow = "1"
-rustix = "1.0.2"
+rustix = { path = "crates/rustix" }
 socket2 = "0.5"
 slab = "0.4"
-
-[patch.crates-io]
-rustix = { path = "crates/rustix" }
