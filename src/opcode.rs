@@ -1366,9 +1366,9 @@ opcode! {
     pub struct FchmodAt {
         dirfd: { impl sealed::UseFd },
         pathname: { *const sys::c_char },
-        mode: { sys::Mode },
         ;;
-        flags: sys::AtFlags = sys::AtFlags::empty()
+        mode: sys::Mode = sys::Mode::empty(),
+        flags: sys::AtFlags = sys::AtFlags::empty(),
     }
 
     pub const CODE = sys::IoringOp::Fchmodat;
@@ -1380,7 +1380,7 @@ opcode! {
         sqe.opcode = Self::CODE;
         sqe.fd = dirfd;
         sqe.addr_or_splice_off_in.addr.ptr = pathname as _;
-        sqe.len.len = mode.bits();
+        sqe.len.len = mode.into();
         sqe.op_flags.fchmod_flags = flags;
         Entry(sqe)
     }
